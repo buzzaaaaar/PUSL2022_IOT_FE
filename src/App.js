@@ -6,11 +6,10 @@ import Lecturers from './pages/Lecturers';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col bg-[#E5E7EB]">
         <Routes>
-         
+          
           <Route path="/lecturers" element={<Lecturers />} />
-          {/* Add other routes as needed */}
         </Routes>
       </div>
     </Router>
