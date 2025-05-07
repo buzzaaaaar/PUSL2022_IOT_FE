@@ -1,134 +1,151 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import Sidebar from '../components/Sidebar';
+import Footer from '../components/Footer';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer
+} from 'recharts';
+import profileIcon from '../images/profile.png';
+import logoutIcon from '../images/logOut.png';
 
-const HomePage = () => {
+const TopPanel = () => {
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+  const userName = "Admin";
+  const initial = userName[0];
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-64 bg-[#4C1D95] text-white p-4">
-        {/* Logo Section */}
-        <div className="mb-8 flex items-center">
-          <img 
-            src="/images/logo.png"  // Main logo
-            alt="Smart University Logo" 
-            className="h-12 mr-2"
-          />
-          <div>
-            <h1 className="text-2xl font-bold mb-1">SMART UNIVERSITY</h1>
-            <p className="text-sm text-[#FACC15]">ATTENDANCE TRACKER</p>
-          </div>
-        </div>
-        
-        <nav>
-          <ul className="space-y-2">
-            <li className="flex items-center p-2 bg-[#3A0D7E] rounded">
-              <img src="/images/home-icon.png" className="w-5 h-5 mr-3" alt="Home" />
-              <span>Home</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/lectures-icon.png" className="w-5 h-5 mr-3" alt="Lectures" />
-              <span>Lectures</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/students-icon.png" className="w-5 h-5 mr-3" alt="Students" />
-              <span>Students</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/lecturers-icon.png" className="w-5 h-5 mr-3" alt="Lecturers" />
-              <span>Lecturers</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/programmes-icon.png" className="w-5 h-5 mr-3" alt="Programmes" />
-              <span>Programmes</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/modules-icon.png" className="w-5 h-5 mr-3" alt="Modules" />
-              <span>Modules</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/analytics-icon.png" className="w-5 h-5 mr-3" alt="Analytics" />
-              <span>Analytics</span>
-            </li>
-            <li className="flex items-center p-2 hover:bg-[#3A0D7E] rounded">
-              <img src="/images/settings-icon.png" className="w-5 h-5 mr-3" alt="Settings" />
-              <span>Settings</span>
-            </li>
-          </ul>
-        </nav>
+    <div className="bg-[#4C1D95] p-4 flex justify-between items-center absolute top-0 right-0 left-80 font-montserrat">
+      <div className="text-white font-bold text-xl ml-4">
+        Home
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1 p-8 overflow-auto">
-        <h2 className="text-2xl font-bold mb-8">Home</h2>
+      
+      <div className="relative" ref={dropdownRef}>
+        <button 
+          onClick={() => setShowDropdown(!showDropdown)}
+          className="bg-white text-[#4C1D95] font-bold rounded-full h-8 w-8 flex items-center justify-center"
+          aria-label="User menu"
+        >
+          {initial}
+        </button>
         
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <img src="/images/students-count-icon.png" className="w-8 h-8 mr-3" alt="Students" />
-              <h3 className="text-gray-500 text-sm font-medium">TOTAL REGISTERED STUDENTS</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">8,036</p>
+        {showDropdown && (
+          <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+            <button 
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-montserrat"
+              onClick={() => setShowDropdown(false)}
+            >
+              <img src={profileIcon} alt="Profile" className="w-4 h-4 mr-2" />
+              <span>Profile</span>
+            </button>
+            <button 
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-montserrat"
+              onClick={() => setShowDropdown(false)}
+            >
+              <img src={logoutIcon} alt="Logout" className="w-4 h-4 mr-2" />
+              <span>Log Out</span>
+            </button>
           </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <img src="/images/live-icon.png" className="w-8 h-8 mr-3" alt="Live" />
-              <h3 className="text-gray-500 text-sm font-medium">LIVE ATTENDANCE STATUS</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">2,121 students present</p>
-          </div>
-          
-          <div className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center">
-              <img src="/images/attendance-icon.png" className="w-8 h-8 mr-3" alt="Attendance" />
-              <h3 className="text-gray-500 text-sm font-medium">THIS WEEK'S ATTENDANCE</h3>
-            </div>
-            <p className="text-3xl font-bold mt-2">87.5%</p>
-          </div>
-        </div>
-        
-        {/* Attendance Chart */}
-        <div className="bg-white p-6 rounded-lg shadow mb-8">
-          <div className="flex items-center mb-4">
-            <img src="/images/chart-icon.png" className="w-6 h-6 mr-2" alt="Chart" />
-            <h3 className="text-lg font-semibold">Overall Attendance %</h3>
-          </div>
-          <div className="h-64">
-            {/* Chart placeholder */}
-            <div className="flex items-end h-full border-b-2 border-l-2 border-gray-200">
-              <div className="flex-1 flex justify-between items-end px-2">
-                <div className="w-8 bg-[#4C1D95] h-3/4"></div>
-                <div className="w-8 bg-[#4C1D95] h-full"></div>
-                <div className="w-8 bg-[#4C1D95] h-5/6"></div>
-                <div className="w-8 bg-[#4C1D95] h-2/3"></div>
-                <div className="w-8 bg-[#4C1D95] h-1/2"></div>
-                <div className="w-8 bg-[#4C1D95] h-1/3"></div>
-                <div className="w-8 bg-[#4C1D95] h-1/4"></div>
-              </div>
-            </div>
-            <div className="flex justify-between mt-2 text-sm text-gray-500">
-              <span>Monday</span>
-              <span>Tuesday</span>
-              <span>Wednesday</span>
-              <span>Thursday</span>
-              <span>Friday</span>
-              <span>Saturday</span>
-              <span>Sunday</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Footer */}
-        <footer className="text-center text-gray-500 text-sm mt-8">
-          <div className="flex justify-center items-center mb-2">
-            <img src="/images/nsbm-logo.png" className="h-8 mr-2" alt="NSBM Logo" />
-            <img src="/images/iot-group-logo.png" className="h-8" alt="IoT Group Logo" />
-          </div>
-          <p>Copyright © 2025 | Smart University Attendance Tracker | Powered By The NSBM Green University Introduction to IoT Group BA</p>
-        </footer>
+        )}
       </div>
     </div>
   );
 };
 
-export default HomePage;
+export default function Home() {
+  return (
+    <div className="flex flex-col h-screen font-montserrat bg-gray-100 relative">
+      {/* Sidebar */}
+      <div className="fixed left-0 top-0 w-80 h-full">
+        <Sidebar />
+      </div>
+      
+      <div className="flex-1 flex flex-col overflow-hidden ml-80">
+        {/* Top Panel */}
+        <TopPanel />
+
+        <main className="flex-1 bg-gray-100 p-6 overflow-auto mt-16">
+          <div className="flex flex-col md:flex-row gap-6 h-full">
+            {/* Left Column - Centered boxes */}
+            <div className="flex flex-col gap-6 w-full md:w-1/3 justify-center">
+              {/* Total Registered Students - Increased height */}
+              <div className="bg-white shadow rounded p-0 h-40 font-montserrat"> {/* Changed from h-32 to h-40 */}
+                <div className="bg-[#FACC15] text-white p-5 rounded-t text-2xl text-center">
+                  TOTAL REGISTERED STUDENTS
+                </div>
+                <div className="text-center text-2xl py-6">8,036</div> {/* Increased text size and padding */}
+              </div>
+
+              {/* Live Attendance Status - Increased height */}
+              <div className="bg-white shadow rounded p-0 h-40 font-montserrat"> {/* Changed from h-32 to h-40 */}
+                <div className="bg-[#F97316] text-white p-5 rounded-t text-2xl text-center">
+                  LIVE ATTENDANCE STATUS
+                </div>
+                <div className="text-center text-2xl py-6"> {/* Increased text size and padding */}
+                  2,121 present
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Chart */}
+            <div className="w-full md:w-2/3">
+              <div className="bg-white shadow rounded p-0 h-full font-montserrat">
+                <div className="bg-[#22C55E] text-white p-6 rounded-t text-2xl text-center">
+                  THIS WEEK'S ATTENDANCE
+                </div>
+                <div className="p-2 h-[calc(100%-3rem)]">
+                  <ResponsiveContainer width="100%" height={400}>
+                    <LineChart
+                      data={data}
+                      margin={{ top: 5, right: 15, left: 0, bottom: 0 }}
+                    >
+                      <CartesianGrid strokeDasharray="2 2" />
+                      <XAxis dataKey="day" />
+                      <YAxis domain={[0, 100]} />
+                      <Tooltip />
+                      <Line
+                        type="monotone"
+                        dataKey="attendance"
+                        stroke="#10B981"
+                        strokeWidth={2}
+                        activeDot={{ r: 5 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
+
+const data = [
+  { day: 'Mon', attendance: 70 },
+  { day: 'Tue', attendance: 55 },
+  { day: 'Wed', attendance: 68 },
+  { day: 'Thu', attendance: 73 },
+  { day: 'Fri', attendance: 69 },
+  { day: 'Sat', attendance: 65 },
+  { day: 'Sun', attendance: 85 },
+];
