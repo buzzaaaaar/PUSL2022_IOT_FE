@@ -6,45 +6,53 @@ import profileIcon from '../images/profile.png';
 import logoutIcon from '../images/logOut.png';
 import saveSuccessfulIcon from '../images/saveSuccessful.png';
 
-const Programmes = () => {
-  const [searchName, setSearchName] = useState('');
-  const [programmes, setProgrammes] = useState([
-    { name: 'BSc (Hons) Business Analytics', faculty: 'Business', duration: '3 years' },
-    { name: 'BSc (Hons) Software Engineering', faculty: 'Computing', duration: '3 years' },
-    { name: 'Foundation in Information Technology', faculty: 'Computing', duration: '1 year' },
-    { name: 'BEng (Hons) Mechatronics', faculty: 'Engineering', duration: '4 years' },
-    { name: 'BSc (Hons) Electrical & Electronic Engineering', faculty: 'Engineering', duration: '4 years' }
+const Modules = () => {
+  const [searchCode, setSearchCode] = useState('');
+  const [modules, setModules] = useState([
+    { code: 'CS101', name: 'Introduction to Programming', programme: 'BSc (Hons) Software Engineering', year: '1 year' },
+    { code: 'CS201', name: 'Data Structures and Algorithms', programme: 'BSc (Hons) Software Engineering', year: '2 years' },
+    { code: 'CN301', name: 'Network Security', programme: 'BSc (Hons) Computer Networks and Security', year: '3 years' },
+    { code: 'EC401', name: 'Embedded Systems', programme: 'BEng (Hons) Electronics and Computer Engineering', year: '4 years' },
+    { code: 'BM101', name: 'Principles of Management', programme: 'BSc (Hons) Business Management', year: '1 year' }
   ]);
-  const [filteredProgrammes, setFilteredProgrammes] = useState([]);
+  const [filteredModules, setFilteredModules] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showPanel, setShowPanel] = useState(false);
   const [panelMode, setPanelMode] = useState('add');
-  const [currentProgramme, setCurrentProgramme] = useState(null);
-  const [newProgramme, setNewProgramme] = useState({
+  const [currentModule, setCurrentModule] = useState(null);
+  const [newModule, setNewModule] = useState({
+    code: '',
     name: '',
-    faculty: '',
-    duration: ''
+    programme: '',
+    year: ''
   });
   const [errors, setErrors] = useState({
+    code: '',
     name: '',
-    faculty: '',
-    duration: ''
+    programme: '',
+    year: ''
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const [programmeToDelete, setProgrammeToDelete] = useState(null);
+  const [moduleToDelete, setModuleToDelete] = useState(null);
   const dropdownRef = useRef(null);
   const userName = "Admin";
   const initial = userName[0];
 
-  // Faculty and duration options
-  const facultyOptions = ['Business', 'Computing', 'Engineering'];
-  const durationOptions = ['1 year', '2 years', '3 years', '4 years'];
+  // Programme and year options
+  const programmeOptions = [
+    'BEng (Hons) Electronics and Computer Engineering',
+    'BSc (Hons) Computer Networks and Security',
+    'BSc (Hons) Software Engineering',
+    'BSc (Hons) Business Management',
+    'Foundation in Computing and Technology'
+  ];
+  const yearOptions = ['1 year', '2 years', '3 years', '4 years'];
 
-  // Initialize with all programmes
+  // Initialize with all modules
   useEffect(() => {
-    setFilteredProgrammes(programmes);
-  }, [programmes]);
+    setFilteredModules(modules);
+  }, [modules]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -58,21 +66,26 @@ const Programmes = () => {
   }, []);
 
   const validateForm = () => {
-    const newErrors = { name: '', faculty: '', duration: '' };
+    const newErrors = { code: '', name: '', programme: '', year: '' };
     let isValid = true;
 
-    if (!newProgramme.name.trim()) {
-      newErrors.name = 'Programme Name is required';
+    if (!newModule.code.trim()) {
+      newErrors.code = 'Module Code is required';
       isValid = false;
     }
 
-    if (!newProgramme.faculty.trim()) {
-      newErrors.faculty = 'Faculty is required';
+    if (!newModule.name.trim()) {
+      newErrors.name = 'Module Name is required';
       isValid = false;
     }
 
-    if (!newProgramme.duration.trim()) {
-      newErrors.duration = 'Duration is required';
+    if (!newModule.programme.trim()) {
+      newErrors.programme = 'Programme is required';
+      isValid = false;
+    }
+
+    if (!newModule.year.trim()) {
+      newErrors.year = 'Programme Year is required';
       isValid = false;
     }
 
@@ -81,50 +94,50 @@ const Programmes = () => {
   };
 
   const handleSearch = () => {
-    if (searchName.trim() === '') {
-      setFilteredProgrammes(programmes);
+    if (searchCode.trim() === '') {
+      setFilteredModules(modules);
     } else {
-      const filtered = programmes.filter(programme => 
-        programme.name.toLowerCase().includes(searchName.toLowerCase())
+      const filtered = modules.filter(module => 
+        module.code.toLowerCase().includes(searchCode.toLowerCase())
       );
-      setFilteredProgrammes(filtered);
+      setFilteredModules(filtered);
     }
   };
 
   const openAddPanel = () => {
     setPanelMode('add');
-    setNewProgramme({ name: '', faculty: '', duration: '' });
-    setErrors({ name: '', faculty: '', duration: '' });
+    setNewModule({ code: '', name: '', programme: '', year: '' });
+    setErrors({ code: '', name: '', programme: '', year: '' });
     setShowPanel(true);
   };
 
-  const openEditPanel = (programme) => {
+  const openEditPanel = (module) => {
     setPanelMode('edit');
-    setCurrentProgramme(programme);
-    setNewProgramme({ ...programme });
-    setErrors({ name: '', faculty: '', duration: '' });
+    setCurrentModule(module);
+    setNewModule({ ...module });
+    setErrors({ code: '', name: '', programme: '', year: '' });
     setShowPanel(true);
   };
 
-  const openDeleteConfirm = (programme) => {
-    setProgrammeToDelete(programme);
+  const openDeleteConfirm = (module) => {
+    setModuleToDelete(module);
     setShowDeleteConfirm(true);
   };
 
   const handleClosePanel = () => {
     setShowPanel(false);
-    setNewProgramme({ name: '', faculty: '', duration: '' });
-    setErrors({ name: '', faculty: '', duration: '' });
+    setNewModule({ code: '', name: '', programme: '', year: '' });
+    setErrors({ code: '', name: '', programme: '', year: '' });
   };
 
   const handleCloseDeleteConfirm = () => {
     setShowDeleteConfirm(false);
-    setProgrammeToDelete(null);
+    setModuleToDelete(null);
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewProgramme(prev => ({ ...prev, [name]: value }));
+    setNewModule(prev => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -134,14 +147,14 @@ const Programmes = () => {
     if (!validateForm()) return;
 
     if (panelMode === 'add') {
-      setProgrammes(prev => [...prev, newProgramme]);
-      setFilteredProgrammes(prev => [...prev, newProgramme]);
+      setModules(prev => [...prev, newModule]);
+      setFilteredModules(prev => [...prev, newModule]);
     } else {
-      setProgrammes(prev => prev.map(p => 
-        p.name === currentProgramme.name ? newProgramme : p
+      setModules(prev => prev.map(m => 
+        m.code === currentModule.code ? newModule : m
       ));
-      setFilteredProgrammes(prev => prev.map(p => 
-        p.name === currentProgramme.name ? newProgramme : p
+      setFilteredModules(prev => prev.map(m => 
+        m.code === currentModule.code ? newModule : m
       ));
     }
 
@@ -153,8 +166,8 @@ const Programmes = () => {
   };
 
   const handleDelete = () => {
-    setProgrammes(prev => prev.filter(p => p.name !== programmeToDelete.name));
-    setFilteredProgrammes(prev => prev.filter(p => p.name !== programmeToDelete.name));
+    setModules(prev => prev.filter(m => m.code !== moduleToDelete.code));
+    setFilteredModules(prev => prev.filter(m => m.code !== moduleToDelete.code));
     handleCloseDeleteConfirm();
   };
 
@@ -166,7 +179,7 @@ const Programmes = () => {
           {/* Page Header */}
           <div className="bg-[#4C1D95] p-4 flex justify-between items-center">
             <div className="text-white font-bold text-xl">
-              Programmes
+              Modules
             </div>
             
             {/* Profile Dropdown */}
@@ -254,7 +267,7 @@ const Programmes = () => {
               <div className="absolute right-0 top-0 h-full w-96 bg-white border-l border-[#D4D4D4] shadow-lg">
                 <div className="p-4 flex justify-between items-center border-b border-[#E5E7EB]">
                   <h2 className="text-xl font-bold text-[#1E1E1E]">
-                    {panelMode === 'add' ? 'Add Programme' : 'Edit Programme'}
+                    {panelMode === 'add' ? 'Add Module' : 'Edit Module'}
                   </h2>
                   <button 
                     onClick={handleClosePanel} 
@@ -266,11 +279,25 @@ const Programmes = () => {
                 
                 <div className="p-6 space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Programme Name</label>
+                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Module Code</label>
+                    <input
+                      type="text"
+                      name="code"
+                      value={newModule.code}
+                      onChange={handleInputChange}
+                      className={`w-full p-3 border-2 border-[#22C55E] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#22C55E] ${
+                        errors.code ? 'border-red-500' : ''
+                      }`}
+                    />
+                    {errors.code && <p className="text-red-500 text-xs mt-1">{errors.code}</p>}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Module Name</label>
                     <input
                       type="text"
                       name="name"
-                      value={newProgramme.name}
+                      value={newModule.name}
                       onChange={handleInputChange}
                       className={`w-full p-3 border-2 border-[#22C55E] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#22C55E] ${
                         errors.name ? 'border-red-500' : ''
@@ -280,39 +307,39 @@ const Programmes = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Faculty</label>
+                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Programme Name</label>
                     <select
-                      name="faculty"
-                      value={newProgramme.faculty}
+                      name="programme"
+                      value={newModule.programme}
                       onChange={handleInputChange}
                       className={`w-full p-3 border-2 border-[#22C55E] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#22C55E] ${
-                        errors.faculty ? 'border-red-500' : ''
+                        errors.programme ? 'border-red-500' : ''
                       }`}
                     >
-                      <option value="">Select Faculty</option>
-                      {facultyOptions.map((faculty) => (
-                        <option key={faculty} value={faculty}>{faculty}</option>
+                      <option value="">Select Programme</option>
+                      {programmeOptions.map((programme) => (
+                        <option key={programme} value={programme}>{programme}</option>
                       ))}
                     </select>
-                    {errors.faculty && <p className="text-red-500 text-xs mt-1">{errors.faculty}</p>}
+                    {errors.programme && <p className="text-red-500 text-xs mt-1">{errors.programme}</p>}
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Duration</label>
+                    <label className="block text-sm font-medium text-[#22C55E] mb-2">Programme Year</label>
                     <select
-                      name="duration"
-                      value={newProgramme.duration}
+                      name="year"
+                      value={newModule.year}
                       onChange={handleInputChange}
                       className={`w-full p-3 border-2 border-[#22C55E] rounded-lg focus:outline-none focus:ring-1 focus:ring-[#22C55E] ${
-                        errors.duration ? 'border-red-500' : ''
+                        errors.year ? 'border-red-500' : ''
                       }`}
                     >
-                      <option value="">Select Duration</option>
-                      {durationOptions.map((duration) => (
-                        <option key={duration} value={duration}>{duration}</option>
+                      <option value="">Select Year</option>
+                      {yearOptions.map((year) => (
+                        <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
-                    {errors.duration && <p className="text-red-500 text-xs mt-1">{errors.duration}</p>}
+                    {errors.year && <p className="text-red-500 text-xs mt-1">{errors.year}</p>}
                   </div>
                   
                   <div className="flex space-x-4 pt-4">
@@ -336,13 +363,13 @@ const Programmes = () => {
 
           {/* Main Content */}
           <div className={`${showPanel || showDeleteConfirm || showSuccess ? 'blur-sm' : ''}`}>
-            {/* Add Programme Button */}
+            {/* Add Module Button */}
             <div className="flex justify-end p-4">
               <button 
                 onClick={openAddPanel}
                 className="px-4 py-2 bg-green-500 text-white rounded-lg font-medium hover:bg-green-600"
               >
-                + ADD PROGRAMME
+                + ADD MODULE
               </button>
             </div>
 
@@ -352,9 +379,9 @@ const Programmes = () => {
                 <div className="relative flex-1">
                   <input
                     type="text"
-                    placeholder="Search by programme name"
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
+                    placeholder="Search by module code"
+                    value={searchCode}
+                    onChange={(e) => setSearchCode(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                     className="w-full p-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4C1D95] bg-white"
                   />
@@ -373,33 +400,35 @@ const Programmes = () => {
               </div>
             </div>
 
-            {/* Programmes Table */}
+            {/* Modules Table */}
             <div className="bg-white mx-4 rounded-lg shadow-md overflow-hidden">
               <table className="w-full">
                 <thead>
                   <tr className="text-left text-[#22C55E] font-bold">
-                    <th className="p-1">PROGRAMME NAME</th>
-                    <th className="p-2">FACULTY</th>
-                    <th className="p-3">DURATION</th>
+                    <th className="p-3">MODULE CODE</th>
+                    <th className="p-3">MODULE NAME</th>
+                    <th className="p-3">PROGRAMME NAME</th>
+                    <th className="p-3">PROGRAMME YEAR</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProgrammes.length > 0 ? (
-                    filteredProgrammes.map((programme) => (
-                      <tr key={programme.name} className="border-t border-gray-200">
-                        <td className="p-3">{programme.name}</td>
-                        <td className="p-3">{programme.faculty}</td>
-                        <td className="p-3">{programme.duration}</td>
+                  {filteredModules.length > 0 ? (
+                    filteredModules.map((module) => (
+                      <tr key={module.code} className="border-t border-gray-200">
+                        <td className="p-3">{module.code}</td>
+                        <td className="p-3">{module.name}</td>
+                        <td className="p-3">{module.programme}</td>
+                        <td className="p-3">{module.year}</td>
                         <td className="p-3 text-right">
-                          <div className="flex justify-end gap-3">
+                          <div className="flex justify-end gap-2">
                             <button 
-                              onClick={() => openEditPanel(programme)}
+                              onClick={() => openEditPanel(module)}
                               className="px-5 py-2 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
                             >
                               EDIT
                             </button>
                             <button 
-                              onClick={() => openDeleteConfirm(programme)}
+                              onClick={() => openDeleteConfirm(module)}
                               className="px-5 py-2 bg-red-500 text-white rounded text-sm hover:bg-red-600"
                             >
                               DELETE
@@ -410,7 +439,7 @@ const Programmes = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="4" className="p-4 text-center text-[#1E1E1E]">
+                      <td colSpan="5" className="p-4 text-center text-[#1E1E1E]">
                         No results found
                       </td>
                     </tr>
@@ -426,4 +455,4 @@ const Programmes = () => {
   );
 };
 
-export default Programmes;
+export default Modules;
