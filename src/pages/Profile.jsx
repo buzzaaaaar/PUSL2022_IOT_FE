@@ -156,57 +156,59 @@ const Profile = () => {
                 </div>
                 
                 {/* Right Column - Change Password */}
-                <div>
-                  <h2 className="text-xl font-bold text-[#3B82F6] mb-6">Change Password</h2>
-                  
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Current Password*</label>
-                    <input
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
-                        errors.currentPassword ? 'border-red-500 ring-1 ring-red-500' : ''
-                      }`}
-                    />
-                    {errors.currentPassword && <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>}
-                  </div>
-                  
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">New Password*</label>
-                    <input
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
-                        errors.newPassword ? 'border-red-500 ring-1 ring-red-500' : ''
-                      }`}
-                    />
-                    {errors.newPassword && <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>}
-                  </div>
-                  
-                  <div className="mb-6">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password*</label>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className={`w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
-                        errors.confirmPassword ? 'border-red-500 ring-1 ring-red-500' : ''
-                      }`}
-                    />
-                    {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleSave}
-                      className="px-8 py-2 bg-[#3B82F6] text-white rounded-lg font-medium hover:bg-blue-600 active:bg-blue-700 active:ring-2 active:ring-blue-300 transition-all"
-                    >
-                      SAVE
-                    </button>
-                  </div>
-                </div>
+<div>
+  <h2 className="text-xl font-bold text-[#3B82F6] mb-6">Change Password</h2>
+  
+  <div className="space-y-6 w-3/4"> {/* Added w-3/4 to match input field width */}
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Current Password*</label>
+      <input
+        type="password"
+        value={currentPassword}
+        onChange={(e) => setCurrentPassword(e.target.value)}
+        className={`w-full p-2 border-2 border-[#1E1E1E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
+          errors.currentPassword ? 'border-red-500 ring-1 ring-red-500' : ''
+        }`}
+      />
+      {errors.currentPassword && <p className="text-red-500 text-xs mt-1">{errors.currentPassword}</p>}
+    </div>
+    
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">New Password*</label>
+      <input
+        type="password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        className={`w-full p-2 border-2 border-[#1E1E1E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
+          errors.newPassword ? 'border-red-500 ring-1 ring-red-500' : ''
+        }`}
+      />
+      {errors.newPassword && <p className="text-red-500 text-xs mt-1">{errors.newPassword}</p>}
+    </div>
+    
+    <div>
+      <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password*</label>
+      <input
+        type="password"
+        value={confirmPassword}
+        onChange={(e) => setConfirmPassword(e.target.value)}
+        className={`w-full p-2 border-2 border-[#1E1E1E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3B82F6] ${
+          errors.confirmPassword ? 'border-red-500 ring-1 ring-red-500' : ''
+        }`}
+      />
+      {errors.confirmPassword && <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>}
+    </div>
+    
+    <div className="flex justify-center">
+      <button
+        onClick={handleSave}
+        className="w-full px-4 py-3 bg-[#3B82F6] text-white rounded-lg font-medium hover:bg-blue-600 active:bg-blue-700 active:ring-2 active:ring-blue-300 transition-all text-center"
+      >
+        SAVE
+      </button>
+    </div>
+  </div>
+</div>
               </div>
             </div>
           </div>
