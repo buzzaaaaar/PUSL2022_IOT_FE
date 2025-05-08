@@ -31,7 +31,7 @@ const TopPanel = () => {
 
   return (
     <div className="bg-[#4C1D95] p-4 flex justify-between items-center absolute top-0 right-0 left-80 font-montserrat">
-      <div className="text-white font-bold text-xl ml-4">
+      <div className="text-white font-bold text-2xl ml-4">
         Home
       </div>
       
@@ -47,14 +47,14 @@ const TopPanel = () => {
         {showDropdown && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
             <button 
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-montserrat"
+              className="w-full text-left px-4 py-2 text-sm text-[#4C1D95] hover:bg-gray-100 flex items-center font-montserrat"
               onClick={() => setShowDropdown(false)}
             >
               <img src={profileIcon} alt="Profile" className="w-4 h-4 mr-2" />
               <span>Profile</span>
             </button>
             <button 
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-montserrat"
+              className="w-full text-left px-4 py-2 text-sm text-[#4C1D95] hover:bg-gray-100 flex items-center font-montserrat"
               onClick={() => setShowDropdown(false)}
             >
               <img src={logoutIcon} alt="Logout" className="w-4 h-4 mr-2" />
@@ -69,7 +69,7 @@ const TopPanel = () => {
 
 export default function Home() {
   return (
-    <div className="flex flex-col h-screen font-montserrat bg-gray-100 relative">
+    <div className="flex flex-col h-screen font-montserrat bg-[#E5E7EB] relative">
       {/* Sidebar */}
       <div className="fixed left-0 top-0 w-80 h-full">
         <Sidebar />
@@ -84,19 +84,19 @@ export default function Home() {
             {/* Left Column - Centered boxes */}
             <div className="flex flex-col gap-6 w-full md:w-1/3 justify-center">
               {/* Total Registered Students - Increased height */}
-              <div className="bg-white shadow rounded p-0 h-40 font-montserrat"> {/* Changed from h-32 to h-40 */}
+              <div className="bg-white shadow rounded p-0 h-40 font-montserrat">
                 <div className="bg-[#FACC15] text-white p-5 rounded-t text-2xl text-center">
                   TOTAL REGISTERED STUDENTS
                 </div>
-                <div className="text-center text-2xl py-6">8,036</div> {/* Increased text size and padding */}
+                <div className="text-center text-2xl py-6">8,036</div>
               </div>
 
               {/* Live Attendance Status - Increased height */}
-              <div className="bg-white shadow rounded p-0 h-40 font-montserrat"> {/* Changed from h-32 to h-40 */}
+              <div className="bg-white shadow rounded p-0 h-40 font-montserrat">
                 <div className="bg-[#F97316] text-white p-5 rounded-t text-2xl text-center">
                   LIVE ATTENDANCE STATUS
                 </div>
-                <div className="text-center text-2xl py-6"> {/* Increased text size and padding */}
+                <div className="text-center text-2xl py-6">
                   2,121 present
                 </div>
               </div>
