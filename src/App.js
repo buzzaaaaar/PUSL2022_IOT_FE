@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Profile from './pages/Profile';
 import Lecturers from './pages/Lecturers';
 import Programmes from './pages/Programmes';
 import Modules from './pages/Modules';
@@ -13,6 +14,7 @@ function App() {
           <Route path="/lecturers" element={<Lecturers />} />
           <Route path="/programmes" element={<Programmes />} />
           <Route path="/modules" element={<Modules />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </Router>

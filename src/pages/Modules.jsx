@@ -193,7 +193,7 @@ const Modules = () => {
               
               {showDropdown && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-20">
-                  <a href="#" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
+                  <a href="/profile" className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center">
                     <img src={profileIcon} alt="Profile" className="w-4 h-4 mr-2" />
                     <span>Profile</span>
                   </a>
