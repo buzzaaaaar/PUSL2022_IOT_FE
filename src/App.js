@@ -4,6 +4,7 @@ import Profile from './pages/Profile';
 import Lecturers from './pages/Lecturers';
 import Programmes from './pages/Programmes';
 import Modules from './pages/Modules';
+import Settings from './pages/Settings';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
           <Route path="/programmes" element={<Programmes />} />
           <Route path="/modules" element={<Modules />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </Router>
