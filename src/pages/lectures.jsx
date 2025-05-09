@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import profileIcon from '../images/profile.png';
 import logoutIcon from '../images/logOut.png';
 import pastLecturesIcon from '../images/pastLectures.png';
@@ -57,14 +58,12 @@ const TopPanel = () => {
   );
 };
 
-// Success Notification Component
 const SuccessNotification = ({ isVisible, onClose }) => {
   if (!isVisible) return null;
   
   return (
     <div className="fixed inset-x-0 top-[152px] flex justify-center items-center z-50 px-4">
       <div className="bg-white rounded-lg shadow-lg flex flex-col max-w-md border-l-4 border-[#22C55E] animate-fadeIn">
-        {/* Close button in the top-right with divider */}
         <div className="flex justify-end border-b border-gray-200 p-2">
           <button 
             onClick={onClose} 
@@ -76,7 +75,6 @@ const SuccessNotification = ({ isVisible, onClose }) => {
           </button>
         </div>
         
-        {/* Notification content with increased height */}
         <div className="p-6 flex items-center">
           <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10 mr-3" />
           <div>
@@ -90,13 +88,14 @@ const SuccessNotification = ({ isVisible, onClose }) => {
 };
 
 const lecturesData = [
-  { module: 'CS2020', lecturer: 'LEC102', date: '2025-04-15', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
-  { module: 'SE2035', lecturer: 'LEC109', date: '2025-04-16', start: '01:00 PM', end: '02:30 PM', location: 'NB-304' },
-  { module: 'IT2011', lecturer: 'LEC101', date: '2025-04-17', start: '11:00 AM', end: '12:00 PM', location: 'NB-110' },
-  { module: 'CS2020', lecturer: 'LEC102', date: '2025-04-18', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
+  { id: 1, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-15', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
+  { id: 2, module: 'SE2035', lecturer: 'LEC109', date: '2025-04-16', start: '01:00 PM', end: '02:30 PM', location: 'NB-304' },
+  { id: 3, module: 'IT2011', lecturer: 'LEC101', date: '2025-04-17', start: '11:00 AM', end: '12:00 PM', location: 'NB-110' },
+  { id: 4, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-18', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
 ];
 
 export default function LecturesPage() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('past');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredLectures, setFilteredLectures] = useState(lecturesData);
@@ -112,11 +111,9 @@ export default function LecturesPage() {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const modalRef = useRef(null);
 
-  // Get current date using useMemo to prevent recreation on every render
   const today = useMemo(() => new Date(), []);
   const currentDay = today.getDate();
 
-  // Sample data for dropdowns
   const moduleCodes = ['CS2020', 'SE2035', 'IT2011', 'CS2025'];
   const lecturerIds = ['LEC101', 'LEC102', 'LEC103', 'LEC104'];
   const locations = ['NB-202', 'NB-304', 'NB-110', 'NB-205'];
@@ -126,7 +123,6 @@ export default function LecturesPage() {
     '04:00 PM', '05:00 PM'
   ];
 
-  // Check if form is valid
   const isFormValid = useMemo(() => {
     return (
       moduleCode.trim() !== '' &&
@@ -177,12 +173,10 @@ export default function LecturesPage() {
     const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
     
-    // Empty cells for days before the start of the month
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(<td key={`empty-${i}`} className="py-1 px-1"></td>);
     }
     
-    // Days of the month
     for (let i = 1; i <= daysInMonth; i++) {
       const isSelected = selectedDate === i && 
                          currentMonth === today.getMonth() && 
@@ -205,7 +199,6 @@ export default function LecturesPage() {
       );
     }
     
-    // Split days into weeks
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(days.slice(i, i + 7));
@@ -218,7 +211,6 @@ export default function LecturesPage() {
     e.preventDefault();
     if (!isFormValid) return;
     
-    // Here you would typically send the data to your backend
     console.log({
       moduleCode,
       lecturerId,
@@ -228,13 +220,9 @@ export default function LecturesPage() {
       location
     });
     
-    // Close the modal
     setShowAddLectureModal(false);
-    
-    // Show success notification
     setShowSuccessNotification(true);
     
-    // Reset form
     setModuleCode('');
     setLecturerId('');
     setSelectedDate(null);
@@ -243,7 +231,10 @@ export default function LecturesPage() {
     setLocation('');
   };
 
-  // Close modal when clicking outside
+  const handleViewAttendance = (lectureId) => {
+    navigate(`/attendance/${lectureId}`);
+  };
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
@@ -254,7 +245,6 @@ export default function LecturesPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Set today's date as default
   useEffect(() => {
     if (showAddLectureModal) {
       setSelectedDate(currentDay);
@@ -265,26 +255,20 @@ export default function LecturesPage() {
 
   return (
     <div className="flex flex-col h-screen bg-[#E5E7EB] font-montserrat">
-      {/* Sidebar */}
       <div className="fixed left-0 top-0 w-80 h-full">
         <Sidebar />
       </div>
 
-      {/* Main content area */}
       <div className="ml-80 flex-1 flex flex-col overflow-hidden">
-        {/* Top Panel */}
         <TopPanel />
 
-        {/* Success Notification */}
         <SuccessNotification 
           isVisible={showSuccessNotification} 
           onClose={() => setShowSuccessNotification(false)} 
         />
 
-        {/* Main content with #E5E7EB background */}
         <main className="flex-1 overflow-auto bg-[#E5E7EB]">
           <div className="px-6 pt-4">
-            {/* Add Lecture Button - Reduced size */}
             <div className="flex justify-end mb-6">
               <button 
                 onClick={() => setShowAddLectureModal(true)}
@@ -294,7 +278,6 @@ export default function LecturesPage() {
               </button>
             </div>
             
-            {/* Tabs container */}
             <div className="bg-white px-6 -mx-6 pb-2 h-20 flex items-center">
               <div className="flex relative w-full">
                 <button
@@ -306,7 +289,6 @@ export default function LecturesPage() {
                   <img src={pastLecturesIcon} alt="Past Lectures" className="w-5 h-5 mr-2" />
                   PAST LECTURES
                 </button>
-                {/* Vertical divider */}
                 <div className="border-r border-gray-300 h-12 my-auto"></div>
                 <button
                   className={`flex items-center justify-center px-6 py-6 text-lg font-semibold flex-1 ${
@@ -317,7 +299,6 @@ export default function LecturesPage() {
                   <img src={scheduledLecturesIcon} alt="Scheduled Lectures" className="w-5 h-5 mr-2" />
                   SCHEDULED LECTURES
                 </button>
-                {/* Green underline for active tab */}
                 <div 
                   className={`absolute bottom-0 h-1.5 bg-[#22C55E] transition-all duration-300 ${
                     activeTab === 'past' ? 'left-0 right-1/2' : 'left-1/2 right-0'
@@ -326,7 +307,6 @@ export default function LecturesPage() {
               </div>
             </div>
 
-            {/* Search Bar - Reduced size */}
             <div className="flex items-center gap-2 mb-4 mt-6 w-1/2">
               <div className="relative flex-1">
                 <input
@@ -351,7 +331,6 @@ export default function LecturesPage() {
               </button>
             </div>
 
-            {/* Table with white background */}
             <div className="bg-white shadow rounded p-4 overflow-auto border border-gray-200 mt-2">
               <table className="w-full table-auto">
                 <thead className="text-left">
@@ -366,8 +345,8 @@ export default function LecturesPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredLectures.map((lec, index) => (
-                    <tr key={index} className="border-b text-gray-800">
+                  {filteredLectures.map((lec) => (
+                    <tr key={lec.id} className="border-b text-gray-800">
                       <td className="py-3 text-center text-sm">{lec.module}</td>
                       <td className="text-center text-sm">{lec.lecturer}</td>
                       <td className="text-center text-sm">{lec.date}</td>
@@ -375,7 +354,10 @@ export default function LecturesPage() {
                       <td className="text-center text-sm">{lec.end}</td>
                       <td className="text-center text-sm">{lec.location}</td>
                       <td className="text-center">
-                        <button className="bg-[#FACC15] hover:bg-white text-white hover:text-[#FACC15] px-3 py-1 rounded border-2 border-[#FACC15] transition-colors duration-300 text-sm">
+                        <button 
+                          onClick={() => handleViewAttendance(lec.id)}
+                          className="bg-[#FACC15] hover:bg-white text-white hover:text-[#FACC15] px-3 py-1 rounded border-2 border-[#FACC15] transition-colors duration-300 text-sm"
+                        >
                           VIEW ATTENDANCE
                         </button>
                       </td>
@@ -387,10 +369,8 @@ export default function LecturesPage() {
           </div>
         </main>
 
-        {/* Footer */}
         <Footer />
 
-        {/* Add Lecture Modal */}
         {showAddLectureModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
             <div 
@@ -398,7 +378,6 @@ export default function LecturesPage() {
               className="bg-white w-full max-w-md h-[calc(100%-32px)] flex flex-col border-l-2 border-[#22C55E]"
               style={{ borderRadius: '0' }}
             >
-              {/* Header with close button */}
               <div className="flex justify-between items-center p-4 border-b border-gray-200">
                 <h2 className="text-xl font-semibold text-[#1E1E1E]">Add Lecture</h2>
                 <button 
@@ -409,11 +388,9 @@ export default function LecturesPage() {
                 </button>
               </div>
 
-              {/* Scrollable form content */}
               <div className="overflow-y-auto flex-grow p-4">
                 <form onSubmit={handleSubmit}>
                   <div className="space-y-4">
-                    {/* Module Code Dropdown */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">Module Code</label>
                       <div className="relative">
@@ -436,7 +413,6 @@ export default function LecturesPage() {
                       </div>
                     </div>
 
-                    {/* Lecturer ID Dropdown */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">Lecturer ID</label>
                       <div className="relative">
@@ -459,7 +435,6 @@ export default function LecturesPage() {
                       </div>
                     </div>
 
-                    {/* Date Picker */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">Date</label>
                       <div className="border-2 border-[#22C55E] p-2">
@@ -507,7 +482,6 @@ export default function LecturesPage() {
                       </div>
                     </div>
 
-                    {/* Start Time Dropdown */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">Start Time</label>
                       <div className="relative">
@@ -530,7 +504,6 @@ export default function LecturesPage() {
                       </div>
                     </div>
 
-                    {/* End Time Dropdown */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">End Time</label>
                       <div className="relative">
@@ -553,7 +526,6 @@ export default function LecturesPage() {
                       </div>
                     </div>
 
-                    {/* Location Dropdown */}
                     <div>
                       <label className="block text-sm font-medium text-[#22C55E] mb-1">Location</label>
                       <div className="relative">
@@ -579,7 +551,6 @@ export default function LecturesPage() {
                 </form>
               </div>
 
-              {/* Buttons at bottom */}
               <div className="p-4 border-t border-gray-200">
                 <div className="flex justify-start space-x-3">
                   <button 

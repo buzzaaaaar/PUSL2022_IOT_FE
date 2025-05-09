@@ -7,4 +7,7 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  fontFamily: {
+        montserrat: ['Montserrat', 'sans-serif'],
+      },
 }
