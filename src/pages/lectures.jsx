@@ -4,6 +4,7 @@ import logoutIcon from '../images/logOut.png';
 import pastLecturesIcon from '../images/pastLectures.png';
 import scheduledLecturesIcon from '../images/scheduledLectures.png';
 import searchIcon from '../images/search.png';
+import saveSuccessfulIcon from '../images/saveSuccessful.png';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 
@@ -36,14 +37,14 @@ const TopPanel = () => {
         {showDropdown && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 font-montserrat">
             <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#22C55E] hover:text-white flex items-center transition-colors duration-200"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 flex items-center transition-colors duration-200"
               onClick={() => console.log("Profile clicked")}
             >
               <img src={profileIcon} alt="Profile" className="w-4 h-4 mr-2" />
               <span>Profile</span>
             </button>
             <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-[#22C55E] hover:text-white flex items-center transition-colors duration-200"
+              className="w-full text-left px-4 py-2 text-sm text-gray-700 flex items-center transition-colors duration-200"
               onClick={() => console.log("Logout clicked")}
             >
               <img src={logoutIcon} alt="Logout" className="w-4 h-4 mr-2" />
@@ -51,6 +52,38 @@ const TopPanel = () => {
             </button>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+// Success Notification Component
+const SuccessNotification = ({ isVisible, onClose }) => {
+  if (!isVisible) return null;
+  
+  return (
+    <div className="fixed inset-x-0 top-[152px] flex justify-center items-center z-50 px-4">
+      <div className="bg-white rounded-lg shadow-lg flex flex-col max-w-md border-l-4 border-[#22C55E] animate-fadeIn">
+        {/* Close button in the top-right with divider */}
+        <div className="flex justify-end border-b border-gray-200 p-2">
+          <button 
+            onClick={onClose} 
+            className="text-gray-500 hover:text-gray-700"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        
+        {/* Notification content with increased height */}
+        <div className="p-6 flex items-center">
+          <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10 mr-3" />
+          <div>
+            <h3 className="font-semibold text-gray-800 text-lg">Save Successful!</h3>
+            <p className="text-gray-600 text-sm">The lecture has been added successfully.</p>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -76,6 +109,7 @@ export default function LecturesPage() {
   const [location, setLocation] = useState('');
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const modalRef = useRef(null);
 
   // Get current date using useMemo to prevent recreation on every render
@@ -91,6 +125,18 @@ export default function LecturesPage() {
     '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', 
     '04:00 PM', '05:00 PM'
   ];
+
+  // Check if form is valid
+  const isFormValid = useMemo(() => {
+    return (
+      moduleCode.trim() !== '' &&
+      lecturerId.trim() !== '' &&
+      selectedDate !== null &&
+      startTime.trim() !== '' &&
+      endTime.trim() !== '' &&
+      location.trim() !== ''
+    );
+  }, [moduleCode, lecturerId, selectedDate, startTime, endTime, location]);
 
   const handleSearch = () => {
     if (searchQuery.trim() === '') {
@@ -170,6 +216,8 @@ export default function LecturesPage() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isFormValid) return;
+    
     // Here you would typically send the data to your backend
     console.log({
       moduleCode,
@@ -179,7 +227,13 @@ export default function LecturesPage() {
       endTime,
       location
     });
+    
+    // Close the modal
     setShowAddLectureModal(false);
+    
+    // Show success notification
+    setShowSuccessNotification(true);
+    
     // Reset form
     setModuleCode('');
     setLecturerId('');
@@ -220,6 +274,12 @@ export default function LecturesPage() {
       <div className="ml-80 flex-1 flex flex-col overflow-hidden">
         {/* Top Panel */}
         <TopPanel />
+
+        {/* Success Notification */}
+        <SuccessNotification 
+          isVisible={showSuccessNotification} 
+          onClose={() => setShowSuccessNotification(false)} 
+        />
 
         {/* Main content with #E5E7EB background */}
         <main className="flex-1 overflow-auto bg-[#E5E7EB]">
@@ -275,7 +335,7 @@ export default function LecturesPage() {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                  className="w-full p-2 pr-8 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#4C1D95] bg-white text-sm placeholder-italic placeholder-[#E5E7EB]"
+                  className="w-full p-2 pr-8 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white text-sm placeholder-italic placeholder-[#E5E7EB]"
                 />
                 <img 
                   src={searchIcon} 
@@ -360,12 +420,12 @@ export default function LecturesPage() {
                         <select
                           value={moduleCode}
                           onChange={(e) => setModuleCode(e.target.value)}
-                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none"
+                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none hover:border-[#22C55E]"
                           required
                         >
                           <option value="">Select Module Code</option>
                           {moduleCodes.map((code) => (
-                            <option key={code} value={code}>{code}</option>
+                            <option key={code} value={code} className="hover:bg-[#22C55E] hover:text-white">{code}</option>
                           ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#22C55E]">
@@ -383,12 +443,12 @@ export default function LecturesPage() {
                         <select
                           value={lecturerId}
                           onChange={(e) => setLecturerId(e.target.value)}
-                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none"
+                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none hover:border-[#22C55E]"
                           required
                         >
                           <option value="">Select Lecturer ID</option>
                           {lecturerIds.map((id) => (
-                            <option key={id} value={id}>{id}</option>
+                            <option key={id} value={id} className="hover:bg-[#22C55E] hover:text-white">{id}</option>
                           ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#22C55E]">
@@ -454,12 +514,12 @@ export default function LecturesPage() {
                         <select
                           value={startTime}
                           onChange={(e) => setStartTime(e.target.value)}
-                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none"
+                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none hover:border-[#22C55E]"
                           required
                         >
                           <option value="">Select Start Time</option>
                           {timeSlots.map((time) => (
-                            <option key={`start-${time}`} value={time}>{time}</option>
+                            <option key={`start-${time}`} value={time} className="hover:bg-[#22C55E] hover:text-white">{time}</option>
                           ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#22C55E]">
@@ -477,12 +537,12 @@ export default function LecturesPage() {
                         <select
                           value={endTime}
                           onChange={(e) => setEndTime(e.target.value)}
-                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none"
+                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none hover:border-[#22C55E]"
                           required
                         >
                           <option value="">Select End Time</option>
                           {timeSlots.map((time) => (
-                            <option key={`end-${time}`} value={time}>{time}</option>
+                            <option key={`end-${time}`} value={time} className="hover:bg-[#22C55E] hover:text-white">{time}</option>
                           ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#22C55E]">
@@ -500,12 +560,12 @@ export default function LecturesPage() {
                         <select
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
-                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none"
+                          className="w-full p-2 border-2 border-[#22C55E] rounded focus:outline-none focus:ring-2 focus:ring-[#22C55E] bg-white appearance-none hover:border-[#22C55E]"
                           required
                         >
                           <option value="">Select Location</option>
                           {locations.map((loc) => (
-                            <option key={loc} value={loc}>{loc}</option>
+                            <option key={loc} value={loc} className="hover:bg-[#22C55E] hover:text-white">{loc}</option>
                           ))}
                         </select>
                         <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[#22C55E]">
@@ -525,7 +585,12 @@ export default function LecturesPage() {
                   <button 
                     type="submit"
                     onClick={handleSubmit}
-                    className="px-4 py-2 bg-[#22C55E] text-white rounded hover:bg-white hover:text-[#22C55E] hover:border-2 hover:border-[#22C55E] border-2 border-[#22C55E] transition-colors duration-300"
+                    disabled={!isFormValid}
+                    className={`px-4 py-2 text-white rounded border-2 border-[#22C55E] transition-colors duration-300 ${
+                      isFormValid 
+                        ? 'bg-[#22C55E] hover:bg-white hover:text-[#22C55E]'
+                        : 'bg-[#22C55E] cursor-not-allowed'
+                    }`}
                   >
                     Save
                   </button>
