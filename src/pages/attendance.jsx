@@ -5,6 +5,7 @@ import Footer from '../components/Footer';
 import searchIcon from '../images/search.png';
 import profileIcon from '../images/profile.png';
 import logoutIcon from '../images/logOut.png';
+import saveSuccessfulIcon from '../images/saveSuccessful.png';
 
 const TopPanel = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -55,12 +56,107 @@ const TopPanel = () => {
   );
 };
 
+const SaveSuccessNotification = ({ onClose }) => {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-xl w-96 relative">
+        {/* Close button section with divider line */}
+        <div className="p-4 border-b border-[#D4D4D4] flex justify-end">
+          <button 
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 text-3xl font-bold"
+          >
+            ×
+          </button>
+        </div>
+        
+        {/* Save successful content */}
+        <div className="p-6 flex items-center justify-center space-x-4">
+          <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10" />
+          <span className="text-lg text-[#013024]">Save Successful</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const OverrideAttendanceModal = ({ student, onClose, onSave }) => {
+  const [status, setStatus] = useState(student.attendanceStatus);
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  const handleSave = () => {
+    onSave(status);
+    setShowSuccess(true);
+  };
+
+  const handleNotificationClose = () => {
+    setShowSuccess(false);
+    onClose();
+  };
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40 flex justify-end font-montserrat">
+        <div className="bg-black bg-opacity-50 absolute inset-0" onClick={onClose}></div>
+        <div className="bg-white w-full max-w-md h-[calc(100vh-64px)] mt-16 relative flex flex-col">
+          <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+            <h2 className="text-xl font-semibold text-[#1E1E1E]">Override Attendance</h2>
+            <button 
+              onClick={onClose}
+              className="text-black hover:text-gray-700 text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+          
+          <div className="p-6 space-y-6 flex-1">
+            <div>
+              <label className="block text-sm font-medium text-[#22C55E] mb-1">Student ID</label>
+              <div className="p-2 bg-gray-100 rounded text-gray-900">{student.studentId}</div>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-[#22C55E] mb-1">Attendance Status</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full p-2 border border-[#22C55E] rounded focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
+              >
+                <option value="Present" className="hover:bg-[#22C55E] hover:text-white">Present</option>
+                <option value="Absent" className="hover:bg-[#22C55E] hover:text-white">Absent</option>
+              </select>
+            </div>
+          </div>
+          
+          <div className="p-6 border-t border-gray-200 flex justify-start space-x-3">
+            <button
+              onClick={handleSave}
+              className="px-4 py-2 bg-[#22C55E] text-white rounded-md border border-[#22C55E] hover:bg-white hover:text-[#22C55E] transition-colors duration-200"
+            >
+              SAVE
+            </button>
+            <button
+              onClick={onClose}
+              className="px-4 py-2 bg-[#22C55E] text-white rounded-md border border-[#22C55E] hover:bg-white hover:text-[#22C55E] transition-colors duration-200"
+            >
+              CANCEL
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {showSuccess && <SaveSuccessNotification onClose={handleNotificationClose} />}
+    </>
+  );
+};
+
 export default function AttendancePage() {
   const { lectureId } = useParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
+  const [showOverrideModal, setShowOverrideModal] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState(null);
   
-  // Initialize state directly with attendance data
   const [filteredData, setFilteredData] = useState([
     { 
       studentId: '20231', 
@@ -96,7 +192,6 @@ export default function AttendancePage() {
     },
   ]);
 
-  // Lecture details lookup
   const lectureDetails = {
     1: { module: 'CS2020', lecturer: 'LEC102', date: '2025-04-15', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
     2: { module: 'SE2035', lecturer: 'LEC109', date: '2025-04-16', start: '01:00 PM', end: '02:30 PM', location: 'NB-304' },
@@ -147,46 +242,28 @@ export default function AttendancePage() {
       return;
     }
     
-    const results = [
-      { 
-        studentId: '20231', 
-        rfidScanStatus: 'Success',
-        rfidScanTime: '08:56:13', 
-        faceScanStatus: 'Success', 
-        faceScanTime: '08:56:19', 
-        attendanceStatus: 'Present' 
-      },
-      { 
-        studentId: '20452', 
-        rfidScanStatus: 'Success',
-        rfidScanTime: '08:58:02', 
-        faceScanStatus: 'Failure', 
-        faceScanTime: 'N/A', 
-        attendanceStatus: 'Absent' 
-      },
-      { 
-        studentId: '20999', 
-        rfidScanStatus: 'Failure',
-        rfidScanTime: 'N/A', 
-        faceScanStatus: 'Success', 
-        faceScanTime: '09:01:44', 
-        attendanceStatus: 'Absent' 
-      },
-      { 
-        studentId: '20503', 
-        rfidScanStatus: 'Failure',
-        rfidScanTime: 'N/A', 
-        faceScanStatus: 'Failure', 
-        faceScanTime: 'N/A', 
-        attendanceStatus: 'Absent' 
-      },
-    ].filter(student => 
+    const results = filteredData.filter(student => 
       student.studentId.toLowerCase().includes(searchQuery.toLowerCase())
     );
     
     setFilteredData(results);
   };
-  
+
+  const handleEditClick = (student) => {
+    setSelectedStudent(student);
+    setShowOverrideModal(true);
+  };
+
+  const handleSaveOverride = (newStatus) => {
+    setFilteredData(prevData =>
+      prevData.map(student =>
+        student.studentId === selectedStudent.studentId
+          ? { ...student, attendanceStatus: newStatus }
+          : student
+      )
+    );
+  };
+
   return (
     <div className="flex h-screen bg-[#E5E7EB] font-montserrat">
       <div className="w-80 bg-gray-800">
@@ -289,7 +366,10 @@ export default function AttendancePage() {
                           <td className="py-3 px-6 text-[#1E1E1E]">{student.faceScanTime}</td>
                           <td className="py-3 px-6 text-[#1E1E1E]">{student.attendanceStatus}</td>
                           <td className="py-3 px-6">
-                            <button className="px-8 py-1.5 bg-[#3B82F6] text-white rounded-md text-sm font-medium border-2 border-[#3B82F6] hover:bg-white hover:text-[#3B82F6] transition-colors duration-200">
+                            <button 
+                              onClick={() => handleEditClick(student)}
+                              className="px-8 py-1.5 bg-[#3B82F6] text-white rounded-md text-sm font-medium border-2 border-[#3B82F6] hover:bg-white hover:text-[#3B82F6] transition-colors duration-200"
+                            >
                               Edit
                             </button>
                           </td>
@@ -313,6 +393,14 @@ export default function AttendancePage() {
           </div>
         </div>
       </div>
+
+      {showOverrideModal && (
+        <OverrideAttendanceModal
+          student={selectedStudent}
+          onClose={() => setShowOverrideModal(false)}
+          onSave={handleSaveOverride}
+        />
+      )}
     </div>
   );
 }

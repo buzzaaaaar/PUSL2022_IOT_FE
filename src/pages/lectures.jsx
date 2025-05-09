@@ -58,7 +58,7 @@ const TopPanel = () => {
   );
 };
 
-const SuccessNotification = ({ isVisible, onClose }) => {
+const SuccessNotification = ({ isVisible, onClose, message, children }) => {
   if (!isVisible) return null;
   
   return (
@@ -79,7 +79,8 @@ const SuccessNotification = ({ isVisible, onClose }) => {
           <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10 mr-3" />
           <div>
             <h3 className="font-semibold text-gray-800 text-lg">Save Successful!</h3>
-            <p className="text-gray-600 text-sm">The lecture has been added successfully.</p>
+            <p className="text-gray-600 text-sm">{message}</p>
+            {children}
           </div>
         </div>
       </div>
@@ -87,19 +88,55 @@ const SuccessNotification = ({ isVisible, onClose }) => {
   );
 };
 
-const lecturesData = [
+const DeleteConfirmation = ({ isVisible, onConfirm, onCancel }) => {
+  if (!isVisible) return null;
+  
+  return (
+    <div className="fixed inset-x-0 top-[152px] flex justify-center items-center z-50 px-4">
+      <div className="bg-white rounded-lg shadow-lg flex flex-col max-w-md w-96 border-l-4 border-[#22C55E] animate-fadeIn">
+        <div className="p-6">
+          <p className="text-gray-600 text-sm mb-6 text-center">Are you sure you want to delete this item?</p>
+          <div className="flex justify-center space-x-4">
+            <button 
+              onClick={onCancel}
+              className="px-6 py-2 bg-[#22C55E] text-white rounded hover:bg-white hover:text-[#22C55E] border-2 border-[#22C55E] transition-colors duration-300"
+            >
+              No
+            </button>
+            <button 
+              onClick={onConfirm}
+              className="px-6 py-2 bg-[#22C55E] text-white rounded hover:bg-white hover:text-[#22C55E] border-2 border-[#22C55E] transition-colors duration-300"
+            >
+              Yes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const pastLecturesData = [
   { id: 1, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-15', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
   { id: 2, module: 'SE2035', lecturer: 'LEC109', date: '2025-04-16', start: '01:00 PM', end: '02:30 PM', location: 'NB-304' },
   { id: 3, module: 'IT2011', lecturer: 'LEC101', date: '2025-04-17', start: '11:00 AM', end: '12:00 PM', location: 'NB-110' },
   { id: 4, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-18', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
 ];
 
+const scheduledLecturesData = [
+  { id: 5, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-15', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
+  { id: 6, module: 'SE2035', lecturer: 'LEC109', date: '2025-04-16', start: '01:00 PM', end: '02:30 PM', location: 'NB-304' },
+  { id: 7, module: 'IT2011', lecturer: 'LEC101', date: '2025-04-17', start: '11:00 AM', end: '12:00 PM', location: 'NB-110' },
+  { id: 8, module: 'CS2020', lecturer: 'LEC102', date: '2025-04-18', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
+];
+
 export default function LecturesPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('past');
   const [searchQuery, setSearchQuery] = useState('');
-  const [filteredLectures, setFilteredLectures] = useState(lecturesData);
-  const [showAddLectureModal, setShowAddLectureModal] = useState(false);
+  const [filteredLectures, setFilteredLectures] = useState(pastLecturesData);
+  const [showLectureModal, setShowLectureModal] = useState(false);
+  const [modalType, setModalType] = useState('add');
   const [selectedDate, setSelectedDate] = useState(null);
   const [moduleCode, setModuleCode] = useState('');
   const [lecturerId, setLecturerId] = useState('');
@@ -109,13 +146,43 @@ export default function LecturesPage() {
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [lectureToDelete, setLectureToDelete] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState('');
+  const [noResultsFound, setNoResultsFound] = useState(false);
+  const [currentLectureId, setCurrentLectureId] = useState(null);
   const modalRef = useRef(null);
 
-  const today = useMemo(() => new Date(), []);
+  const [today, setToday] = useState(new Date());
   const currentDay = today.getDate();
 
-  const moduleCodes = ['CS2020', 'SE2035', 'IT2011', 'CS2025'];
-  const lecturerIds = ['LEC101', 'LEC102', 'LEC103', 'LEC104'];
+  // Update today's date daily
+  useEffect(() => {
+    const updateToday = () => {
+      const now = new Date();
+      if (now.getDate() !== today.getDate() || 
+          now.getMonth() !== today.getMonth() || 
+          now.getFullYear() !== today.getFullYear()) {
+        setToday(now);
+      }
+    };
+
+    // Update at midnight
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    const timeUntilMidnight = midnight.getTime() - new Date().getTime();
+
+    const timeoutId = setTimeout(() => {
+      updateToday();
+      // Then update every 24 hours
+      setInterval(updateToday, 24 * 60 * 60 * 1000);
+    }, timeUntilMidnight);
+
+    return () => clearTimeout(timeoutId);
+  }, [today]);
+
+  const moduleCodes = ['CS2020', 'SE2035', 'IT2011', 'CS2025', 'SE2040', 'IT2015'];
+  const lecturerIds = ['LEC101', 'LEC102', 'LEC103', 'LEC104', 'LEC105'];
   const locations = ['NB-202', 'NB-304', 'NB-110', 'NB-205'];
   const timeSlots = [
     '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', 
@@ -134,17 +201,38 @@ export default function LecturesPage() {
     );
   }, [moduleCode, lecturerId, selectedDate, startTime, endTime, location]);
 
+  useEffect(() => {
+    setFilteredLectures(activeTab === 'past' ? pastLecturesData : scheduledLecturesData);
+  }, [activeTab]);
+
   const handleSearch = () => {
+    const dataToSearch = activeTab === 'past' ? pastLecturesData : scheduledLecturesData;
+    
     if (searchQuery.trim() === '') {
-      setFilteredLectures(lecturesData);
+      setFilteredLectures(dataToSearch);
+      setNoResultsFound(false);
     } else {
-      const filtered = lecturesData.filter(lecture => 
+      const filtered = dataToSearch.filter(lecture => 
         lecture.module.toLowerCase().includes(searchQuery.toLowerCase()) ||
         lecture.lecturer.toLowerCase().includes(searchQuery.toLowerCase())
       );
-      setFilteredLectures(filtered);
+      
+      if (filtered.length === 0) {
+        setNoResultsFound(true);
+        setFilteredLectures([]);
+      } else {
+        setNoResultsFound(false);
+        setFilteredLectures(filtered);
+      }
     }
   };
+
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredLectures(activeTab === 'past' ? pastLecturesData : scheduledLecturesData);
+      setNoResultsFound(false);
+    }
+  }, [searchQuery, activeTab]);
 
   const handleDateSelect = (date) => {
     setSelectedDate(date);
@@ -181,16 +269,16 @@ export default function LecturesPage() {
       const isSelected = selectedDate === i && 
                          currentMonth === today.getMonth() && 
                          currentYear === today.getFullYear();
-      const isToday = i === currentDay && 
+      const isToday = i === today.getDate() && 
                       currentMonth === today.getMonth() && 
                       currentYear === today.getFullYear();
       days.push(
         <td 
           key={`day-${i}`} 
           className={`py-1 px-1 text-center cursor-pointer text-sm ${
-            isToday ? 'font-bold' : ''
+            isToday ? 'font-bold bg-[#22C55E] text-white rounded-full' : ''
           } ${
-            isSelected ? 'bg-[#22C55E] text-white rounded-full' : 'hover:bg-gray-100'
+            isSelected ? 'bg-[#3B82F6] text-white rounded-full' : 'hover:bg-gray-100'
           }`}
           onClick={() => handleDateSelect(i)}
         >
@@ -211,17 +299,46 @@ export default function LecturesPage() {
     e.preventDefault();
     if (!isFormValid) return;
     
-    console.log({
-      moduleCode,
-      lecturerId,
-      date: selectedDate ? `${currentYear}-${currentMonth + 1}-${selectedDate}` : '',
-      startTime,
-      endTime,
-      location
-    });
+    if (modalType === 'add') {
+      const newLecture = {
+        id: scheduledLecturesData.length + 1,
+        module: moduleCode,
+        lecturer: lecturerId,
+        date: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`,
+        start: startTime,
+        end: endTime,
+        location: location
+      };
+      
+      scheduledLecturesData.unshift(newLecture);
+      if (activeTab === 'scheduled') {
+        setFilteredLectures([newLecture, ...filteredLectures]);
+      }
+      setNotificationMessage('The lecture has been added successfully.');
+      setShowSuccessNotification(true);
+    } else {
+      // Update existing lecture
+      const lectureIndex = scheduledLecturesData.findIndex(lec => lec.id === currentLectureId);
+      if (lectureIndex !== -1) {
+        scheduledLecturesData[lectureIndex] = {
+          ...scheduledLecturesData[lectureIndex],
+          module: moduleCode,
+          lecturer: lecturerId,
+          date: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(selectedDate).padStart(2, '0')}`,
+          start: startTime,
+          end: endTime,
+          location: location
+        };
+        
+        if (activeTab === 'scheduled') {
+          setFilteredLectures([...scheduledLecturesData]);
+        }
+        setNotificationMessage('The lecture has been updated successfully.');
+        setShowSuccessNotification(true);
+      }
+    }
     
-    setShowAddLectureModal(false);
-    setShowSuccessNotification(true);
+    setShowLectureModal(false);
     
     setModuleCode('');
     setLecturerId('');
@@ -229,29 +346,68 @@ export default function LecturesPage() {
     setStartTime('');
     setEndTime('');
     setLocation('');
+    setCurrentLectureId(null);
   };
 
-  const handleViewAttendance = (lectureId) => {
-    navigate(`/attendance/${lectureId}`);
+  const handleEditLecture = (lectureId) => {
+    const lectureToEdit = scheduledLecturesData.find(lec => lec.id === lectureId);
+    if (lectureToEdit) {
+      const dateParts = lectureToEdit.date.split('-');
+      const year = parseInt(dateParts[0]);
+      const month = parseInt(dateParts[1]) - 1;
+      const day = parseInt(dateParts[2]);
+      
+      setModuleCode(lectureToEdit.module);
+      setLecturerId(lectureToEdit.lecturer);
+      setSelectedDate(day);
+      setCurrentMonth(month);
+      setCurrentYear(year);
+      setStartTime(lectureToEdit.start);
+      setEndTime(lectureToEdit.end);
+      setLocation(lectureToEdit.location);
+      setCurrentLectureId(lectureId);
+      setModalType('edit');
+      setShowLectureModal(true);
+    }
+  };
+
+  const handleDeleteClick = (lectureId) => {
+    setLectureToDelete(lectureId);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    const index = scheduledLecturesData.findIndex(lec => lec.id === lectureToDelete);
+    if (index !== -1) {
+      scheduledLecturesData.splice(index, 1);
+      setFilteredLectures(scheduledLecturesData.filter(lec => lec.id !== lectureToDelete));
+    }
+    setShowDeleteConfirmation(false);
+    setLectureToDelete(null);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setLectureToDelete(null);
+  };
+
+  const handleAddLecture = () => {
+    setModalType('add');
+    setShowLectureModal(true);
+    setSelectedDate(today.getDate());
+    setCurrentMonth(today.getMonth());
+    setCurrentYear(today.getFullYear());
   };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (modalRef.current && !modalRef.current.contains(event.target)) {
-        setShowAddLectureModal(false);
+        setShowLectureModal(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  useEffect(() => {
-    if (showAddLectureModal) {
-      setSelectedDate(currentDay);
-      setCurrentMonth(today.getMonth());
-      setCurrentYear(today.getFullYear());
-    }
-  }, [showAddLectureModal, currentDay, today]);
 
   return (
     <div className="flex flex-col h-screen bg-[#E5E7EB] font-montserrat">
@@ -264,14 +420,21 @@ export default function LecturesPage() {
 
         <SuccessNotification 
           isVisible={showSuccessNotification} 
-          onClose={() => setShowSuccessNotification(false)} 
+          onClose={() => setShowSuccessNotification(false)}
+          message={notificationMessage}
+        />
+
+        <DeleteConfirmation
+          isVisible={showDeleteConfirmation}
+          onConfirm={handleDeleteConfirm}
+          onCancel={handleDeleteCancel}
         />
 
         <main className="flex-1 overflow-auto bg-[#E5E7EB]">
           <div className="px-6 pt-4">
             <div className="flex justify-end mb-6">
               <button 
-                onClick={() => setShowAddLectureModal(true)}
+                onClick={handleAddLecture}
                 className="bg-[#22C55E] hover:bg-white text-white hover:text-[#22C55E] font-semibold px-4 py-2 text-base border-2 border-[#22C55E] transition-colors duration-300"
               >
                 + ADD LECTURE
@@ -341,28 +504,53 @@ export default function LecturesPage() {
                     <th className="font-normal text-center">Start Time</th>
                     <th className="font-normal text-center">End Time</th>
                     <th className="font-normal text-center">Location</th>
-                    <th className="font-normal text-center">Actions</th>
+                    <th className="font-normal text-center"></th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredLectures.map((lec) => (
-                    <tr key={lec.id} className="border-b text-gray-800">
-                      <td className="py-3 text-center text-sm">{lec.module}</td>
-                      <td className="text-center text-sm">{lec.lecturer}</td>
-                      <td className="text-center text-sm">{lec.date}</td>
-                      <td className="text-center text-sm">{lec.start}</td>
-                      <td className="text-center text-sm">{lec.end}</td>
-                      <td className="text-center text-sm">{lec.location}</td>
-                      <td className="text-center">
-                        <button 
-                          onClick={() => handleViewAttendance(lec.id)}
-                          className="bg-[#FACC15] hover:bg-white text-white hover:text-[#FACC15] px-3 py-1 rounded border-2 border-[#FACC15] transition-colors duration-300 text-sm"
-                        >
-                          VIEW ATTENDANCE
-                        </button>
+                  {noResultsFound ? (
+                    <tr>
+                      <td colSpan="7" className="py-6 text-center text-gray-500">
+                        No results found
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    filteredLectures.map((lec) => (
+                      <tr key={lec.id} className="border-b text-gray-800">
+                        <td className="py-3 text-center text-sm">{lec.module}</td>
+                        <td className="text-center text-sm">{lec.lecturer}</td>
+                        <td className="text-center text-sm">{lec.date}</td>
+                        <td className="text-center text-sm">{lec.start}</td>
+                        <td className="text-center text-sm">{lec.end}</td>
+                        <td className="text-center text-sm">{lec.location}</td>
+                        <td className="text-center space-x-2">
+                          {activeTab === 'past' ? (
+                            <button 
+                              onClick={() => navigate(`/attendance/${lec.id}`)}
+                              className="bg-[#FACC15] hover:bg-white text-white hover:text-[#FACC15] px-4 py-1 rounded border-2 border-[#FACC15] transition-colors duration-300 text-sm"
+                            >
+                              VIEW ATTENDANCE
+                            </button>
+                          ) : (
+                            <>
+                              <button 
+                                onClick={() => handleEditLecture(lec.id)}
+                                className="bg-[#3B82F6] hover:bg-white text-white hover:text-[#3B82F6] px-4 py-1 rounded border-2 border-[#3B82F6] transition-colors duration-300 text-sm"
+                              >
+                                EDIT
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteClick(lec.id)}
+                                className="bg-[#EF4444] hover:bg-white text-white hover:text-[#EF4444] px-4 py-1 rounded border-2 border-[#EF4444] transition-colors duration-300 text-sm"
+                              >
+                                DELETE
+                              </button>
+                            </>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>
@@ -371,7 +559,7 @@ export default function LecturesPage() {
 
         <Footer />
 
-        {showAddLectureModal && (
+        {showLectureModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-end z-50 pt-16">
             <div 
               ref={modalRef}
@@ -379,9 +567,11 @@ export default function LecturesPage() {
               style={{ borderRadius: '0' }}
             >
               <div className="flex justify-between items-center p-4 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-[#1E1E1E]">Add Lecture</h2>
+                <h2 className="text-xl font-semibold text-[#1E1E1E]">
+                  {modalType === 'add' ? 'Add Lecture' : 'Edit Lecture'}
+                </h2>
                 <button 
-                  onClick={() => setShowAddLectureModal(false)}
+                  onClick={() => setShowLectureModal(false)}
                   className="text-black hover:text-gray-700 text-3xl font-bold px-2"
                 >
                   ×
@@ -563,11 +753,11 @@ export default function LecturesPage() {
                         : 'bg-[#22C55E] cursor-not-allowed'
                     }`}
                   >
-                    Save
+                    SAVE
                   </button>
                   <button 
                     type="button"
-                    onClick={() => setShowAddLectureModal(false)}
+                    onClick={() => setShowLectureModal(false)}
                     className="px-4 py-2 bg-[#22C55E] text-white rounded hover:bg-white hover:text-[#22C55E] hover:border-2 hover:border-[#22C55E] border-2 border-[#22C55E] transition-colors duration-300"
                   >
                     Cancel
