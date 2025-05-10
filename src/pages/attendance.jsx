@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Footer from '../components/Footer';
 import searchIcon from '../images/search.png';
@@ -60,7 +60,6 @@ const SaveSuccessNotification = ({ onClose }) => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg shadow-xl w-96 relative">
-        {/* Close button section with divider line */}
         <div className="p-4 border-b border-[#D4D4D4] flex justify-end">
           <button 
             onClick={onClose}
@@ -70,7 +69,6 @@ const SaveSuccessNotification = ({ onClose }) => {
           </button>
         </div>
         
-        {/* Save successful content */}
         <div className="p-6 flex items-center justify-center space-x-4">
           <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10" />
           <span className="text-lg text-[#013024]">Save Successful</span>
@@ -122,8 +120,8 @@ const OverrideAttendanceModal = ({ student, onClose, onSave }) => {
                 onChange={(e) => setStatus(e.target.value)}
                 className="w-full p-2 border border-[#22C55E] rounded focus:outline-none focus:ring-1 focus:ring-[#22C55E]"
               >
-                <option value="Present" className="hover:bg-[#22C55E] hover:text-white">Present</option>
-                <option value="Absent" className="hover:bg-[#22C55E] hover:text-white">Absent</option>
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
               </select>
             </div>
           </div>
@@ -152,6 +150,7 @@ const OverrideAttendanceModal = ({ student, onClose, onSave }) => {
 
 export default function AttendancePage() {
   const { lectureId } = useParams();
+  const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [hasSearched, setHasSearched] = useState(false);
   const [showOverrideModal, setShowOverrideModal] = useState(false);
@@ -198,6 +197,15 @@ export default function AttendancePage() {
     3: { module: 'IT2011', lecturer: 'LEC101', date: '2025-04-17', start: '11:00 AM', end: '12:00 PM', location: 'NB-110' },
     4: { module: 'CS2020', lecturer: 'LEC102', date: '2025-04-18', start: '09:00 AM', end: '10:30 AM', location: 'NB-202' },
   };
+
+  useEffect(() => {
+    if (location.state?.showOverrideModal && location.state?.student) {
+      setSelectedStudent(location.state.student);
+      setShowOverrideModal(true);
+      // Clear the state to prevent the modal from showing again on refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   const currentLecture = lectureDetails[lectureId] || lectureDetails[1];
 
@@ -250,8 +258,12 @@ export default function AttendancePage() {
   };
 
   const handleEditClick = (student) => {
-    setSelectedStudent(student);
-    setShowOverrideModal(true);
+    // Store the student data and lectureId in sessionStorage
+    sessionStorage.setItem('overrideStudent', JSON.stringify(student));
+    sessionStorage.setItem('lectureId', lectureId);
+    
+    // Redirect to reauthentication page
+    window.location.href = '/reauthentication';
   };
 
   const handleSaveOverride = (newStatus) => {
