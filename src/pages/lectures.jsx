@@ -27,25 +27,25 @@ const TopPanel = () => {
 
   return (
     <div className="bg-[#4C1D95] p-4 flex justify-between items-center font-montserrat">
-      <div className="text-white font-bold text-xl">Lectures</div>
+      <div className="text-white text-xl">Lectures</div>
       <div className="relative" ref={dropdownRef}>
         <button 
           onClick={() => setShowDropdown(!showDropdown)}
-          className="bg-white text-[#4C1D95] font-bold rounded-full h-8 w-8 flex items-center justify-center"
+          className="bg-white text-[#4C1D95] h-8 w-8 rounded-full flex items-center justify-center"
         >
           {initial}
         </button>
         {showDropdown && (
           <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10 font-montserrat">
             <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 flex items-center transition-colors duration-200"
+              className="w-full text-left px-4 py-2 text-sm text-[#4C1D95] flex items-center relative hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-0.5 hover:after:bg-[#4C1D95]"
               onClick={() => console.log("Profile clicked")}
             >
               <img src={profileIcon} alt="Profile" className="w-4 h-4 mr-2" />
               <span>Profile</span>
             </button>
             <button
-              className="w-full text-left px-4 py-2 text-sm text-gray-700 flex items-center transition-colors duration-200"
+              className="w-full text-left px-4 py-2 text-sm text-[#4C1D95] flex items-center relative hover:after:content-[''] hover:after:absolute hover:after:bottom-0 hover:after:left-0 hover:after:w-full hover:after:h-0.5 hover:after:bg-[#4C1D95]"
               onClick={() => console.log("Logout clicked")}
             >
               <img src={logoutIcon} alt="Logout" className="w-4 h-4 mr-2" />
@@ -78,7 +78,7 @@ const SuccessNotification = ({ isVisible, onClose, message, children }) => {
         <div className="p-6 flex items-center">
           <img src={saveSuccessfulIcon} alt="Success" className="w-10 h-10 mr-3" />
           <div>
-            <h3 className="font-semibold text-gray-800 text-lg">Save Successful!</h3>
+            <h3 className="text-gray-800 text-lg">Save Successful!</h3>
             <p className="text-gray-600 text-sm">{message}</p>
             {children}
           </div>
@@ -276,7 +276,7 @@ export default function LecturesPage() {
         <td 
           key={`day-${i}`} 
           className={`py-1 px-1 text-center cursor-pointer text-sm ${
-            isToday ? 'font-bold bg-[#22C55E] text-white rounded-full' : ''
+            isToday ? 'bg-[#22C55E] text-white rounded-full' : ''
           } ${
             isSelected ? 'bg-[#3B82F6] text-white rounded-full' : 'hover:bg-gray-100'
           }`}
@@ -435,39 +435,43 @@ export default function LecturesPage() {
             <div className="flex justify-end mb-6">
               <button 
                 onClick={handleAddLecture}
-                className="bg-[#22C55E] hover:bg-white text-white hover:text-[#22C55E] font-semibold px-4 py-2 text-base border-2 border-[#22C55E] transition-colors duration-300"
+                className="bg-[#22C55E] hover:bg-white text-white hover:text-[#22C55E] px-4 py-2 text-base border-2 border-[#22C55E] transition-colors duration-300"
               >
                 + ADD LECTURE
               </button>
             </div>
             
-            <div className="bg-white px-6 -mx-6 pb-2 h-20 flex items-center">
-              <div className="flex relative w-full">
+            <div className="bg-white px-6 -mx-6 h-28 flex items-center mt-16 relative">
+              <div className="flex w-full">
                 <button
-                  className={`flex items-center justify-center px-6 py-6 text-lg font-semibold flex-1 ${
-                    activeTab === 'past' ? 'text-black' : 'text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center px-6 py-6 text-xl flex-1 text-[#1E1E1E]`}
                   onClick={() => setActiveTab('past')}
                 >
-                  <img src={pastLecturesIcon} alt="Past Lectures" className="w-5 h-5 mr-2" />
+                  <img 
+                    src={pastLecturesIcon} 
+                    alt="Past Lectures" 
+                    className="w-6 h-6 mr-3" 
+                  />
                   PAST LECTURES
                 </button>
                 <div className="border-r border-gray-300 h-12 my-auto"></div>
                 <button
-                  className={`flex items-center justify-center px-6 py-6 text-lg font-semibold flex-1 ${
-                    activeTab === 'scheduled' ? 'text-black' : 'text-gray-500'
-                  }`}
+                  className={`flex items-center justify-center px-6 py-6 text-xl flex-1 text-[#1E1E1E]`}
                   onClick={() => setActiveTab('scheduled')}
                 >
-                  <img src={scheduledLecturesIcon} alt="Scheduled Lectures" className="w-5 h-5 mr-2" />
+                  <img 
+                    src={scheduledLecturesIcon} 
+                    alt="Scheduled Lectures" 
+                    className="w-6 h-6 mr-3" 
+                  />
                   SCHEDULED LECTURES
                 </button>
-                <div 
-                  className={`absolute bottom-0 h-1.5 bg-[#22C55E] transition-all duration-300 ${
-                    activeTab === 'past' ? 'left-0 right-1/2' : 'left-1/2 right-0'
-                  }`}
-                ></div>
               </div>
+              <div 
+                className={`absolute bottom-0 h-1 bg-[#22C55E] ${
+                  activeTab === 'past' ? 'left-0 right-1/2' : 'left-1/2 right-0'
+                }`}
+              ></div>
             </div>
 
             <div className="flex items-center gap-2 mb-4 mt-6 w-1/2">
@@ -498,13 +502,13 @@ export default function LecturesPage() {
               <table className="w-full table-auto">
                 <thead className="text-left">
                   <tr className="text-base uppercase border-b-2 text-[#22C55E]">
-                    <th className="py-2 font-normal text-center">Module Code</th>
-                    <th className="font-normal text-center">Lecturer ID</th>
-                    <th className="font-normal text-center">Date</th>
-                    <th className="font-normal text-center">Start Time</th>
-                    <th className="font-normal text-center">End Time</th>
-                    <th className="font-normal text-center">Location</th>
-                    <th className="font-normal text-center"></th>
+                    <th className="py-2 text-center">Module Code</th>
+                    <th className="text-center">Lecturer ID</th>
+                    <th className="text-center">Date</th>
+                    <th className="text-center">Start Time</th>
+                    <th className="text-center">End Time</th>
+                    <th className="text-center">Location</th>
+                    <th className="text-center"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -567,12 +571,12 @@ export default function LecturesPage() {
               style={{ borderRadius: '0' }}
             >
               <div className="flex justify-between items-center p-4 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-[#1E1E1E]">
+                <h2 className="text-xl text-[#1E1E1E]">
                   {modalType === 'add' ? 'Add Lecture' : 'Edit Lecture'}
                 </h2>
                 <button 
                   onClick={() => setShowLectureModal(false)}
-                  className="text-black hover:text-gray-700 text-3xl font-bold px-2"
+                  className="text-black hover:text-gray-700 text-3xl px-2"
                 >
                   ×
                 </button>
@@ -582,7 +586,7 @@ export default function LecturesPage() {
                 <form onSubmit={handleSubmit}>
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">Module Code</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">Module Code</label>
                       <div className="relative">
                         <select
                           value={moduleCode}
@@ -604,7 +608,7 @@ export default function LecturesPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">Lecturer ID</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">Lecturer ID</label>
                       <div className="relative">
                         <select
                           value={lecturerId}
@@ -626,10 +630,10 @@ export default function LecturesPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">Date</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">Date</label>
                       <div className="border-2 border-[#22C55E] p-2">
                         <div className="flex justify-between items-center mb-1">
-                          <span className="font-medium text-sm">
+                          <span className="text-sm">
                             {new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long' })} {currentYear}
                           </span>
                           <div className="flex space-x-2">
@@ -673,7 +677,7 @@ export default function LecturesPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">Start Time</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">Start Time</label>
                       <div className="relative">
                         <select
                           value={startTime}
@@ -695,7 +699,7 @@ export default function LecturesPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">End Time</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">End Time</label>
                       <div className="relative">
                         <select
                           value={endTime}
@@ -717,7 +721,7 @@ export default function LecturesPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-[#22C55E] mb-1">Location</label>
+                      <label className="block text-sm text-[#22C55E] mb-1">Location</label>
                       <div className="relative">
                         <select
                           value={location}
