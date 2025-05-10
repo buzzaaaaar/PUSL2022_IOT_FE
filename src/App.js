@@ -4,6 +4,7 @@ import Home from './pages/home';
 import LecturesPage from './pages/lectures';
 import AttendancePage from './pages/attendance';
 import Reauthentication from './pages/reauthentication';
+import AnalyticsPage from './pages/analytics';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/attendance" element={<AttendancePage />} />
         <Route path="/reauthentication" element={<Reauthentication />} />
         <Route path="/attendance/:lectureId" element={<AttendancePage />} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
       </Routes>
     </Router>
   );
